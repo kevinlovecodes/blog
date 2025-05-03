@@ -205,90 +205,122 @@
     
 </article>
 <!-- 嵌入giscus评论 -->
-<div style="max-width: 800px; margin: 20px auto 24px; padding: 0 16px;">
+<div style="max-width: 800px; margin: 10px auto 24px; padding: 0 16px;">
   <div class="giscus-container">
-    <script src="https://giscus.app/client.js"
-      data-repo="kevinlovecodes/blog"
-      data-repo-id="R_kgDOOjvubQ"
-      data-category="Announcements"
-      data-category-id="DIC_kwDOOjvubc4CpufH"
-      data-mapping="pathname"
-      data-strict="0"
-      data-reactions-enabled="1"
-      data-emit-metadata="0"
-      data-input-position="bottom"
-      data-theme="preferred_color_scheme"
-      data-lang="zh-CN"
-      data-loading="lazy"
-      crossorigin="anonymous"
-      async>
+    <script>
+      // 立即执行获取当前主题并设置giscus的主题
+      (function() {
+        // 获取当前主题
+        function getCurrentTheme() {
+          const theme = document.documentElement.getAttribute('data-color-scheme');
+          if (theme === 'dark') return 'dark';
+          if (theme === 'light') return 'light';
+          // 如果是auto，则根据系统主题决定
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        
+        // 设置giscus的主题属性
+        document.write('<script src="https://giscus.app/client.js" \
+          data-repo="kevinlovecodes/blog" \
+          data-repo-id="R_kgDOOjvubQ" \
+          data-category="Announcements" \
+          data-category-id="DIC_kwDOOjvubc4CpufH" \
+          data-mapping="pathname" \
+          data-strict="0" \
+          data-reactions-enabled="1" \
+          data-emit-metadata="0" \
+          data-input-position="bottom" \
+          data-theme="' + getCurrentTheme() + '" \
+          data-lang="zh-CN" \
+          data-loading="lazy" \
+          crossorigin="anonymous" \
+          async><\/script>');
+      })();
     </script>
   </div>
 </div>
 
 <script>
-// 修复主题跟随问题
+// 主题切换监听和处理
 (function() {
-  // 等待iframe加载完成
-  function waitForGiscusIframe(callback, maxAttempts = 50) {
-    let attempts = 0;
-    const checkInterval = setInterval(function() {
-      const iframe = document.querySelector('iframe.giscus-frame');
-      attempts++;
-      
-      if (iframe) {
-        clearInterval(checkInterval);
-        callback(iframe);
-        return;
-      }
-      
-      if (attempts >= maxAttempts) {
-        clearInterval(checkInterval);
-        console.log('无法找到giscus iframe');
-      }
-    }, 300);
-  }
-
-  // 根据当前主题设置giscus主题
-  function updateGiscusTheme() {
-    const theme = document.documentElement.getAttribute('data-color-scheme');
-    let giscusTheme = 'light';
+  function updateGiscusTheme(theme) {
+    const iframe = document.querySelector('iframe.giscus-frame');
+    if (!iframe) return;
     
+    let giscusTheme = 'light';
     if (theme === 'dark') {
       giscusTheme = 'dark';
     } else if (theme === 'auto') {
       giscusTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     
-    waitForGiscusIframe(function(iframe) {
-      iframe.contentWindow.postMessage(
-        { giscus: { setConfig: { theme: giscusTheme } } },
-        'https://giscus.app'
-      );
-    });
+    iframe.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: giscusTheme } } },
+      'https://giscus.app'
+    );
   }
 
-  // 页面加载后初始化
-  window.addEventListener('load', function() {
-    // 初始设置主题
-    updateGiscusTheme();
+  // 等待DOM完全加载再添加事件监听
+  window.addEventListener('DOMContentLoaded', function() {
+    // 单独监听每个主题按钮
+    const lightRadio = document.querySelector('input[value="light"]');
+    const darkRadio = document.querySelector('input[value="dark"]');
+    const autoRadio = document.querySelector('input[value="auto"]');
     
-    // 监听主题切换按钮的点击
-    const lightBtn = document.querySelector('#theme-color-scheme-toggle input[value="light"]');
-    const darkBtn = document.querySelector('#theme-color-scheme-toggle input[value="dark"]');
-    const autoBtn = document.querySelector('#theme-color-scheme-toggle input[value="auto"]');
+    if (lightRadio) {
+      lightRadio.addEventListener('click', function() {
+        updateGiscusTheme('light');
+      });
+    }
     
-    if (lightBtn) lightBtn.addEventListener('click', function() { setTimeout(updateGiscusTheme, 100); });
-    if (darkBtn) darkBtn.addEventListener('click', function() { setTimeout(updateGiscusTheme, 100); });
-    if (autoBtn) autoBtn.addEventListener('click', function() { setTimeout(updateGiscusTheme, 100); });
+    if (darkRadio) {
+      darkRadio.addEventListener('click', function() {
+        updateGiscusTheme('dark');
+      });
+    }
+    
+    if (autoRadio) {
+      autoRadio.addEventListener('click', function() {
+        updateGiscusTheme('auto');
+      });
+    }
     
     // 监听系统主题变化
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
-      if (document.documentElement.getAttribute('data-color-scheme') === 'auto') {
-        updateGiscusTheme();
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', function() {
+      const currentTheme = document.documentElement.getAttribute('data-color-scheme');
+      if (currentTheme === 'auto') {
+        updateGiscusTheme('auto');
       }
     });
   });
+  
+  // 如果DOMContentLoaded已经触发，手动运行初始化
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeTheme);
+  } else {
+    initializeTheme();
+  }
+  
+  function initializeTheme() {
+    // 通过MutationObserver监听iframe的加载
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.addedNodes) {
+          mutation.addedNodes.forEach(function(node) {
+            if (node.tagName === 'IFRAME' && node.classList.contains('giscus-frame')) {
+              // iframe已加载，更新主题
+              updateGiscusTheme(document.documentElement.getAttribute('data-color-scheme'));
+              observer.disconnect(); // 停止观察
+            }
+          });
+        }
+      });
+    });
+    
+    // 开始观察body的变化
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
 })();
 </script>
 <footer>
