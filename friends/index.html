@@ -175,7 +175,7 @@
     </div>
 
     <!-- 嵌入giscus评论 -->
-    <div style="max-width: 800px; margin: 50px auto 0 !important; padding: 0 16px;">
+    <div style="max-width: 800px; margin: 50px auto 10px !important; padding: 0 16px;">
       <div class="giscus-container">
         <script>
           // 立即执行获取当前主题并设置giscus的主题
@@ -541,7 +541,7 @@
           const parentDiv = container.parentElement;
           if (parentDiv && parentDiv.style) {
             parentDiv.style.marginTop = '50px';
-            parentDiv.style.marginBottom = '0'; // 友链页面底部无间距
+            parentDiv.style.marginBottom = '10px'; // 友链页面底部间距与博文一致
             console.log('已应用友链页面评论区容器样式');
           }
         });
@@ -552,7 +552,7 @@
       if (containers && containers.length > 0) {
         containers.forEach(container => {
           container.style.setProperty('margin-top', '50px', 'important');
-          container.style.setProperty('margin-bottom', '0', 'important'); // 友链页面底部无间距
+          container.style.setProperty('margin-bottom', '10px', 'important'); // 友链页面底部间距与博文一致
           console.log('已设置友链页面评论区容器样式');
         });
       }
@@ -563,19 +563,19 @@
         iframes.forEach(iframe => {
           // 设置iframe自身的样式
           iframe.style.setProperty('margin-top', '10px', 'important');
-          iframe.style.setProperty('margin-bottom', '0', 'important'); // 友链页面底部无间距
+          iframe.style.setProperty('margin-bottom', '10px', 'important'); // 友链页面底部间距与博文一致
           
           // 设置父元素样式
           const parent = iframe.parentElement;
           if (parent) {
             parent.style.setProperty('margin-top', '50px', 'important');
-            parent.style.setProperty('margin-bottom', '0', 'important'); // 友链页面底部无间距
+            parent.style.setProperty('margin-bottom', '10px', 'important'); // 友链页面底部间距与博文一致
             
             // 设置祖父元素样式（如果存在）
             const grandParent = parent.parentElement;
             if (grandParent) {
               grandParent.style.setProperty('margin-top', '50px', 'important');
-              grandParent.style.setProperty('margin-bottom', '0', 'important'); // 友链页面底部无间距
+              grandParent.style.setProperty('margin-bottom', '10px', 'important'); // 友链页面底部间距与博文一致
             }
           }
         });
@@ -636,12 +636,8 @@
       const nextElement = container.nextElementSibling;
       if (nextElement) {
         nextElement.style.setProperty('margin-top', '50px', 'important');
-        // 检查是否是友链页面
-        if (document.body.classList.contains('friends-page')) {
-          nextElement.style.setProperty('margin-bottom', '0', 'important'); // 友链页面底部无间距
-        } else {
-          nextElement.style.setProperty('margin-bottom', '10px', 'important');
-        }
+        // 所有页面保持一致的底部间距
+        nextElement.style.setProperty('margin-bottom', '10px', 'important');
       }
     });
   }
@@ -667,14 +663,14 @@
       '.giscus-wrapper'
     ];
     
-    // 对每个选择器应用无底部间距样式
+    // 对每个选择器应用10px底部间距样式
     selectors.forEach(selector => {
       const elements = document.querySelectorAll(selector);
       if (elements.length > 0) {
         elements.forEach(el => {
-          el.style.setProperty('margin-bottom', '0', 'important');
+          el.style.setProperty('margin-bottom', '10px', 'important');
           el.style.setProperty('padding-bottom', '0', 'important');
-          console.log(`已设置${selector}的底部间距为0`);
+          console.log(`已设置${selector}的底部间距为10px`);
         });
       }
     });
@@ -682,8 +678,8 @@
     // 设置页脚样式
     const footer = document.querySelector('footer');
     if (footer) {
-      footer.style.setProperty('margin-top', '0', 'important');
-      console.log('已设置页脚上边距为0');
+      footer.style.setProperty('margin-top', '10px', 'important');
+      console.log('已设置页脚上边距为10px');
     }
   }
   

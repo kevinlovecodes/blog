@@ -66,33 +66,33 @@ function adjustCommentMargins() {
   // 选择评论区容器
   const container = document.querySelector('div[style*="max-width: 800px"]');
   if (container) {
-    container.style.setProperty('margin-bottom', '0', 'important');
-    console.log('已设置友链页面评论区容器底部边距为0');
+    container.style.setProperty('margin-bottom', '10px', 'important');
+    console.log('已设置友链页面评论区容器底部边距为10px');
   }
   
   // 选择giscus容器
   const giscusContainer = document.querySelector('.giscus-container');
   if (giscusContainer) {
-    giscusContainer.style.setProperty('margin-bottom', '0', 'important');
+    giscusContainer.style.setProperty('margin-bottom', '10px', 'important');
     
     // 获取父元素
     const parent = giscusContainer.parentElement;
     if (parent) {
-      parent.style.setProperty('margin-bottom', '0', 'important');
+      parent.style.setProperty('margin-bottom', '10px', 'important');
     }
   }
   
   // 处理iframe
   const iframe = document.querySelector('iframe.giscus-frame');
   if (iframe) {
-    iframe.style.setProperty('margin-bottom', '0', 'important');
+    iframe.style.setProperty('margin-bottom', '10px', 'important');
     
     // 获取父元素链
     let currentElement = iframe;
     for (let i = 0; i < 3; i++) { // 向上查找3层父元素
       currentElement = currentElement.parentElement;
       if (currentElement) {
-        currentElement.style.setProperty('margin-bottom', '0', 'important');
+        currentElement.style.setProperty('margin-bottom', '10px', 'important');
       } else {
         break;
       }
@@ -104,10 +104,10 @@ function adjustCommentMargins() {
         const style = document.createElement('style');
         style.textContent = `
           .gsc-comments {
-            margin-bottom: 0 !important;
+            margin-bottom: 10px !important;
           }
           .gsc-comment-box {
-            margin-bottom: 0 !important;
+            margin-bottom: 10px !important;
           }
         `;
         iframe.contentDocument.head.appendChild(style);
@@ -120,13 +120,13 @@ function adjustCommentMargins() {
   // 调整页脚与评论区之间的间距
   const footer = document.querySelector('footer');
   if (footer) {
-    footer.style.setProperty('margin-top', '0', 'important');
+    footer.style.setProperty('margin-top', '10px', 'important');
   }
   
-  // 确保页面底部没有多余空白
+  // 确保页面底部有适当的空白
   const containers = document.querySelectorAll('.container');
   if (containers.length > 0) {
     const lastContainer = containers[containers.length - 1];
-    lastContainer.style.setProperty('margin-bottom', '0', 'important');
+    lastContainer.style.setProperty('margin-bottom', '10px', 'important');
   }
 } 

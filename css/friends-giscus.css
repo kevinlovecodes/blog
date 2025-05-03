@@ -4,42 +4,42 @@
 .friends-page .giscus-container,
 .friends-page div[style*="max-width: 800px"] {
   margin-top: 50px !important;
-  margin-bottom: 0 !important; /* 移除底部间距 */
+  margin-bottom: 10px !important; /* 与博文页面保持一致的10px底部间距 */
 }
 
 /* 当评论区在post-prev-next之后 */
 .friends-page .post-prev-next + div {
   margin-top: 50px !important;
-  margin-bottom: 0 !important; /* 移除底部间距 */
+  margin-bottom: 10px !important; /* 与博文页面保持一致的10px底部间距 */
 }
 
 /* 评论区iframe */
 .friends-page iframe.giscus-frame {
-  margin-bottom: 0 !important; /* 移除iframe底部间距 */
+  margin-bottom: 10px !important; /* 与博文页面保持一致的10px底部间距 */
 }
 
-/* 确保页脚与评论区之间没有多余间距 */
+/* 确保页脚与评论区之间有适当间距 */
 .friends-page footer,
 .friends-page .footer-wrapper {
-  margin-top: 0 !important;
-  padding-top: 20px !important; /* 添加适当的顶部间距 */
+  margin-top: 10px !important; /* 保持一些顶部间距 */
+  padding-top: 20px !important;
 }
 
 /* 覆盖全局样式 */
 .friends-page .giscus-container > *,
 .friends-page div:has(> .giscus-container) {
-  margin-bottom: 0 !important;
+  margin-bottom: 10px !important; /* 与博文页面保持一致的10px底部间距 */
 }
 
-/* 强制移除评论区下方空白 */
+/* 评论区样式调整 */
 .friends-page .giscus,
 .friends-page .giscus-frame {
-  margin-bottom: 0 !important;
+  margin-bottom: 10px !important; /* 与博文页面保持一致的10px底部间距 */
   padding-bottom: 0 !important;
 }
 
-/* 确保评论区与页脚之间没有空白 */
+/* 确保评论区与页脚之间有适当间距 */
 .friends-page .container:last-of-type,
 .friends-page .content:last-of-type {
-  margin-bottom: 0 !important;
+  margin-bottom: 10px !important; /* 与博文页面保持一致的10px底部间距 */
 } 
