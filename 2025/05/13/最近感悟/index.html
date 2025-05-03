@@ -81,7 +81,10 @@
   <link rel="stylesheet" href="/css/custom.css">
   <!-- Giscus评论样式 -->
   <link rel="stylesheet" href="/css/giscus-custom.css">
-<meta name="generator" content="Hexo 7.3.0"></head>
+<meta name="generator" content="Hexo 7.3.0">
+  <!-- Giscus iframe样式注入器 -->
+  <script src="/iframe-style-injector.js"></script>
+</head>
     <body
         data-color-scheme="auto"
         data-uppercase-categories="true"
@@ -502,5 +505,126 @@
             })
         </script>
         
-    </body>
+    
+<!-- 强制设置评论区样式的脚本 -->
+<script>
+(function() {
+  // 立即执行一次
+  applyStyles();
+  
+  // DOM加载完成后执行
+  document.addEventListener('DOMContentLoaded', applyStyles);
+  
+  // 页面完全加载后再次执行
+  window.addEventListener('load', function() {
+    applyStyles();
+    // 页面加载后延迟执行，确保giscus已加载
+    setTimeout(applyStyles, 1000);
+  });
+  
+  // 创建MutationObserver监听DOM变化
+  const observer = new MutationObserver(function(mutations) {
+    let shouldApply = false;
+    
+    // 检查是否有iframe被添加到页面
+    mutations.forEach(function(mutation) {
+      if (mutation.addedNodes && mutation.addedNodes.length) {
+        for (let i = 0; i < mutation.addedNodes.length; i++) {
+          const node = mutation.addedNodes[i];
+          if (node.tagName === 'IFRAME' && node.classList.contains('giscus-frame')) {
+            shouldApply = true;
+            // 监听iframe加载完成事件
+            node.addEventListener('load', function() {
+              setTimeout(applyStyles, 100);
+            });
+            break;
+          }
+        }
+      }
+    });
+    
+    if (shouldApply) {
+      applyStyles();
+    }
+  });
+  
+  // 启动观察器
+  observer.observe(document.body, { 
+    childList: true, 
+    subtree: true 
+  });
+  
+  // 设置周期性检查（前10秒每500ms检查一次）
+  let checkCount = 0;
+  const maxChecks = 20; // 10秒内检查20次
+  const intervalId = setInterval(function() {
+    applyStyles();
+    checkCount++;
+    if (checkCount >= maxChecks) {
+      clearInterval(intervalId);
+    }
+  }, 500);
+  
+  // 应用样式的函数
+  function applyStyles() {
+    // 直接选择评论区容器
+    const giscusContainers = document.querySelectorAll('.giscus-container');
+    if (giscusContainers && giscusContainers.length > 0) {
+      giscusContainers.forEach(container => {
+        const parentDiv = container.parentElement;
+        if (parentDiv && parentDiv.style) {
+          parentDiv.style.marginTop = '50px';
+          parentDiv.style.marginBottom = '10px';
+          console.log('已应用评论区容器样式');
+        }
+      });
+    }
+    
+    // 选择样式包含max-width的div元素（giscus通常在这样的容器中）
+    const containers = document.querySelectorAll('div[style*="max-width: 800px"]');
+    if (containers && containers.length > 0) {
+      containers.forEach(container => {
+        container.style.setProperty('margin-top', '50px', 'important');
+        container.style.setProperty('margin-bottom', '10px', 'important');
+        console.log('已设置评论区容器样式');
+      });
+    }
+    
+    // 处理giscus iframe
+    const iframes = document.querySelectorAll('iframe.giscus-frame');
+    if (iframes && iframes.length > 0) {
+      iframes.forEach(iframe => {
+        // 设置iframe自身的样式
+        iframe.style.setProperty('margin-top', '10px', 'important');
+        iframe.style.setProperty('margin-bottom', '10px', 'important');
+        
+        // 设置父元素样式
+        const parent = iframe.parentElement;
+        if (parent) {
+          parent.style.setProperty('margin-top', '50px', 'important');
+          parent.style.setProperty('margin-bottom', '10px', 'important');
+          
+          // 设置祖父元素样式（如果存在）
+          const grandParent = parent.parentElement;
+          if (grandParent) {
+            grandParent.style.setProperty('margin-top', '50px', 'important');
+            grandParent.style.setProperty('margin-bottom', '10px', 'important');
+          }
+        }
+      });
+    }
+    
+    // 查找并设置特定位置后的评论区
+    const prevNextContainers = document.querySelectorAll('.post-prev-next');
+    prevNextContainers.forEach(container => {
+      const nextElement = container.nextElementSibling;
+      if (nextElement) {
+        nextElement.style.setProperty('margin-top', '50px', 'important');
+        nextElement.style.setProperty('margin-bottom', '10px', 'important');
+      }
+    });
+  }
+})();
+</script>
+</body>
 </html>
