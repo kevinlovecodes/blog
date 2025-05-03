@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const giscusContainer = document.createElement('div');
     giscusContainer.className = 'giscus-container';
     
-    // 找到插入评论的位置 - 在post-prev-next之后
-    const postPrevNext = document.querySelector('.post-prev-next');
+    // 找到插入评论的位置 - 在container post-prev-next之后
+    const postPrevNext = document.querySelector('.container.post-prev-next');
     if (postPrevNext && postPrevNext.parentNode) {
       postPrevNext.parentNode.insertBefore(giscusContainer, postPrevNext.nextSibling);
       
