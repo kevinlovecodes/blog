@@ -10,8 +10,22 @@
   margin-bottom: 20px !important;
 }
 
-/* 评论区上方元素 */
+/* 更直接地选择评论区容器 */
+div[style*="max-width: 800px"] {
+  margin: 50px auto 10px !important;
+  padding: 0 16px !important;
+}
+
+/* 针对友链页面 */
 .post-prev-next + div {
-  margin-top: 40px !important;
+  margin-top: 50px !important;
+  margin-bottom: 10px !important;
+}
+
+/* 额外的强制样式 */
+.container.post-prev-next + div,
+article + div[style*="max-width"],
+.content + div[style*="max-width"] {
+  margin-top: 50px !important;
   margin-bottom: 10px !important;
 } 

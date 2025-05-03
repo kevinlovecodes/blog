@@ -6,7 +6,7 @@ const path = require('path');
 // giscus评论代码（不包含评论标题）
 const giscusCode = `
 <!-- 嵌入giscus评论 -->
-<div style="max-width: 800px; margin: 40px auto 10px; padding: 0 16px;">
+<div style="max-width: 800px; margin: 50px auto 10px !important; padding: 0 16px;">
   <div class="giscus-container">
     <script>
       // 立即执行获取当前主题并设置giscus的主题
