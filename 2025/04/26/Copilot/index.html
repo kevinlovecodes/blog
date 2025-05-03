@@ -79,6 +79,8 @@
 
   <!-- 自定义CSS，修复分页问题 -->
   <link rel="stylesheet" href="/css/custom.css">
+  <!-- Giscus评论样式 -->
+  <link rel="stylesheet" href="/css/giscus-custom.css">
 <meta name="generator" content="Hexo 7.3.0"></head>
     <body
         data-color-scheme="auto"
@@ -243,7 +245,7 @@
     
 </article>
 <!-- 嵌入giscus评论 -->
-<div style="max-width: 800px; margin: 10px auto 24px; padding: 0 16px;">
+<div style="max-width: 800px; margin: 50px auto 10px !important; padding: 0 16px;">
   <div class="giscus-container">
     <script>
       // 立即执行获取当前主题并设置giscus的主题
@@ -281,9 +283,22 @@
 <script>
 // 主题切换监听和处理
 (function() {
+  // 全局变量存储当前加载状态和上次主题
+  let giscusReady = false;
+  let lastTheme = '';
+  let waitingForIframe = false;
+  let checkInterval = null;
+  
   function updateGiscusTheme(theme) {
     const iframe = document.querySelector('iframe.giscus-frame');
-    if (!iframe) return;
+    if (!iframe) {
+      // 如果iframe不存在且没有开始等待，启动轮询检查
+      if (!waitingForIframe) {
+        waitingForIframe = true;
+        startPollingForIframe(theme);
+      }
+      return;
+    }
     
     let giscusTheme = 'light';
     if (theme === 'dark') {
@@ -292,36 +307,69 @@
       giscusTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     
-    iframe.contentWindow.postMessage(
-      { giscus: { setConfig: { theme: giscusTheme } } },
-      'https://giscus.app'
-    );
+    // 只有当主题变化时才发送消息
+    if (lastTheme !== giscusTheme) {
+      lastTheme = giscusTheme;
+      try {
+        iframe.contentWindow.postMessage(
+          { giscus: { setConfig: { theme: giscusTheme } } },
+          'https://giscus.app'
+        );
+        console.log('Giscus theme updated to:', giscusTheme);
+      } catch (e) {
+        console.error('Failed to update giscus theme:', e);
+      }
+    }
+    
+    // 标记giscus已经就绪
+    giscusReady = true;
+    
+    // 如果轮询存在，清除它
+    if (checkInterval) {
+      clearInterval(checkInterval);
+      checkInterval = null;
+    }
+  }
+  
+  // 轮询检查iframe是否已加载
+  function startPollingForIframe(theme) {
+    if (checkInterval) {
+      clearInterval(checkInterval);
+    }
+    
+    // 每100ms检查一次iframe是否存在
+    checkInterval = setInterval(() => {
+      const iframe = document.querySelector('iframe.giscus-frame');
+      if (iframe) {
+        updateGiscusTheme(theme);
+        clearInterval(checkInterval);
+        checkInterval = null;
+        waitingForIframe = false;
+      }
+    }, 100);
+    
+    // 60秒后如果还没找到就停止轮询
+    setTimeout(() => {
+      if (checkInterval) {
+        clearInterval(checkInterval);
+        checkInterval = null;
+        waitingForIframe = false;
+        console.log('Gave up waiting for giscus iframe');
+      }
+    }, 60000);
   }
 
-  // 等待DOM完全加载再添加事件监听
-  window.addEventListener('DOMContentLoaded', function() {
-    // 单独监听每个主题按钮
-    const lightRadio = document.querySelector('input[value="light"]');
-    const darkRadio = document.querySelector('input[value="dark"]');
-    const autoRadio = document.querySelector('input[value="auto"]');
-    
-    if (lightRadio) {
-      lightRadio.addEventListener('click', function() {
-        updateGiscusTheme('light');
+  // 添加主题切换事件处理
+  function addThemeListeners() {
+    // 单独监听每个主题按钮的变化
+    const allRadios = document.querySelectorAll('input[name="theme"]');
+    allRadios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.checked) {
+          updateGiscusTheme(this.value);
+        }
       });
-    }
-    
-    if (darkRadio) {
-      darkRadio.addEventListener('click', function() {
-        updateGiscusTheme('dark');
-      });
-    }
-    
-    if (autoRadio) {
-      autoRadio.addEventListener('click', function() {
-        updateGiscusTheme('auto');
-      });
-    }
+    });
     
     // 监听系统主题变化
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -331,25 +379,40 @@
         updateGiscusTheme('auto');
       }
     });
-  });
-  
-  // 如果DOMContentLoaded已经触发，手动运行初始化
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeTheme);
-  } else {
-    initializeTheme();
+    
+    // 监听颜色方案变化
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-color-scheme') {
+          updateGiscusTheme(document.documentElement.getAttribute('data-color-scheme'));
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['data-color-scheme'] 
+    });
   }
   
-  function initializeTheme() {
-    // 通过MutationObserver监听iframe的加载
+  // 设置iframe加载监听
+  function setupIframeListener() {
     const observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
         if (mutation.addedNodes) {
           mutation.addedNodes.forEach(function(node) {
             if (node.tagName === 'IFRAME' && node.classList.contains('giscus-frame')) {
-              // iframe已加载，更新主题
-              updateGiscusTheme(document.documentElement.getAttribute('data-color-scheme'));
-              observer.disconnect(); // 停止观察
+              // iframe已加载，立即更新主题
+              const currentTheme = document.documentElement.getAttribute('data-color-scheme');
+              updateGiscusTheme(currentTheme);
+              
+              // 添加iframe加载完成事件监听
+              node.addEventListener('load', function() {
+                // iframe内容完全加载后，再次更新主题以确保设置正确
+                setTimeout(() => {
+                  updateGiscusTheme(document.documentElement.getAttribute('data-color-scheme'));
+                }, 300);
+              });
             }
           });
         }
@@ -358,6 +421,26 @@
     
     // 开始观察body的变化
     observer.observe(document.body, { childList: true, subtree: true });
+  }
+  
+  // 初始化函数
+  function initialize() {
+    setupIframeListener();
+    addThemeListeners();
+    
+    // 页面加载完成后再次尝试更新主题
+    window.addEventListener('load', function() {
+      setTimeout(() => {
+        updateGiscusTheme(document.documentElement.getAttribute('data-color-scheme'));
+      }, 500);
+    });
+  }
+  
+  // 根据页面加载状态运行初始化
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initialize);
+  } else {
+    initialize();
   }
 })();
 </script>
