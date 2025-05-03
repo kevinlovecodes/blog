@@ -1,0 +1,75 @@
+<!-- 复制下面的内容，直接粘贴到友链页面HTML文件的<head>部分的最后 -->
+
+<!-- 评论区的内联样式 -->
+<style id="force-giscus-styles">
+  /* 评论区容器 */
+  .giscus-container, 
+  iframe.giscus-frame,
+  div[style*="max-width: 800px"],
+  .giscus,
+  .giscus-wrapper {
+    margin-bottom: 10px !important;
+  }
+  
+  /* 确保页面底部没有多余空白 */
+  body.friends-page {
+    margin-bottom: 0 !important;
+  }
+  
+  /* 评论区容器样式 */
+  .friends-page div[style*="max-width: 800px"] {
+    margin: 50px auto 10px !important;
+  }
+</style>
+
+<!-- 复制下面的内容，直接粘贴到友链页面HTML文件的</body>标签前 -->
+
+<!-- 强制应用评论区样式的脚本 -->
+<script>
+(function() {
+  document.addEventListener('DOMContentLoaded', function() {
+    forceCommentStyles();
+  });
+  
+  window.addEventListener('load', function() {
+    forceCommentStyles();
+    setTimeout(forceCommentStyles, 1000);
+    setTimeout(forceCommentStyles, 2000);
+  });
+  
+  function forceCommentStyles() {
+    // 直接强制设置评论区容器样式
+    const container = document.querySelector('div[style*="max-width: 800px"]');
+    if (container) {
+      container.style.margin = '50px auto 10px !important';
+      container.style.padding = '0 16px';
+    }
+    
+    // 选择所有可能的评论区元素
+    const selectors = [
+      '.giscus-container', 
+      'iframe.giscus-frame', 
+      '.giscus',
+      '.giscus-wrapper'
+    ];
+    
+    selectors.forEach(selector => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(el => {
+        el.style.marginBottom = '10px';
+      });
+    });
+    
+    console.log('已强制应用评论区样式');
+  }
+})();
+</script>
+
+<!-- 手动修复方法：
+在浏览器开发者工具中直接添加以下样式：
+
+1. 打开开发者工具 (F12)
+2. 找到评论区容器元素（通常是 div[style*="max-width: 800px"]）
+3. 编辑其内联样式为：
+   max-width: 800px; margin: 50px auto 10px !important; padding: 0 16px;
+--> 

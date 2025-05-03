@@ -379,7 +379,74 @@
     
 </article>
 
-        <footer>
+        
+<script>
+(function() {
+  console.log('终极修复脚本已加载');
+  
+  // 立即应用样式
+  forceApplyStyles();
+  
+  // 页面加载时再次应用
+  window.addEventListener('load', function() {
+    forceApplyStyles();
+    setTimeout(forceApplyStyles, 1000);
+    setTimeout(forceApplyStyles, 2000);
+  });
+  
+  // 强制应用样式函数
+  function forceApplyStyles() {
+    // 直接获取评论区容器
+    const commentContainer = document.querySelector('div[style*="max-width: 800px"]');
+    if (commentContainer) {
+      // 直接设置内联样式
+      commentContainer.setAttribute('style', 'max-width: 800px; margin: 50px auto 10px !important; padding: 0 16px !important;');
+      console.log('直接修改了评论区容器样式');
+    }
+    
+    // 设置iframe样式
+    const iframes = document.querySelectorAll('iframe.giscus-frame');
+    iframes.forEach(iframe => {
+      iframe.style.marginBottom = '10px';
+      
+      // 设置所有父元素的底部边距
+      let parent = iframe.parentElement;
+      while (parent && parent !== document.body) {
+        parent.style.marginBottom = '10px';
+        parent = parent.parentElement;
+      }
+    });
+    
+    // 创建一个新的样式元素添加到头部
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `
+      /* 评论区底部边距强制样式 */
+      .giscus-container, 
+      iframe.giscus-frame,
+      .giscus-frame-wrapper,
+      div[style*="max-width: 800px"],
+      .giscus,
+      .giscus-wrapper {
+        margin-bottom: 10px !important;
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+})();
+</script>
+
+<!-- 评论区底部边距内联样式 -->
+<style>
+.giscus-container, 
+iframe.giscus-frame,
+.giscus-frame-wrapper,
+div[style*="max-width: 800px"],
+.giscus,
+.giscus-wrapper {
+  margin-bottom: 10px !important;
+}
+</style>
+<footer>
     <div class="inner">
         <div class="links">
             
