@@ -1,0 +1,17 @@
+/* 自定义Giscus评论区样式 */
+.giscus-container {
+  margin-top: 30px !important;
+  margin-bottom: 10px !important;
+}
+
+/* 评论区iframe容器 */
+.giscus-frame {
+  margin-top: 10px !important;
+  margin-bottom: 20px !important;
+}
+
+/* 评论区上方元素 */
+.post-prev-next + div {
+  margin-top: 40px !important;
+  margin-bottom: 10px !important;
+} 
