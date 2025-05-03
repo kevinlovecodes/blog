@@ -6,7 +6,7 @@ const path = require('path');
 // giscus评论代码（不包含评论标题）
 const giscusCode = `
 <!-- 嵌入giscus评论 -->
-<div style="max-width: 800px; margin: 64px auto 24px; padding: 0 16px;">
+<div style="max-width: 800px; margin: 40px auto 24px; padding: 0 16px;">
   <div class="giscus-container">
     <script src="https://giscus.app/client.js"
       data-repo="kevinlovecodes/blog"
@@ -26,6 +26,52 @@ const giscusCode = `
     </script>
   </div>
 </div>
+
+<script>
+// 监听主题变化并更新giscus主题
+function updateGiscusTheme() {
+  const theme = document.documentElement.getAttribute('data-color-scheme');
+  let giscusTheme = 'light';
+  
+  if (theme === 'dark') {
+    giscusTheme = 'dark';
+  } else if (theme === 'auto') {
+    giscusTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  
+  function sendMessage(message) {
+    const iframe = document.querySelector('iframe.giscus-frame');
+    if (!iframe) return;
+    iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+  }
+  
+  sendMessage({
+    setConfig: {
+      theme: giscusTheme
+    }
+  });
+}
+
+// 监听主题切换事件
+document.addEventListener('DOMContentLoaded', function() {
+  updateGiscusTheme();
+  
+  // 监听主题切换
+  const themeToggle = document.getElementById('theme-color-scheme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('change', function() {
+      setTimeout(updateGiscusTheme, 300); // 延迟执行以确保主题已切换
+    });
+  }
+  
+  // 监听系统主题变化（针对auto模式）
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+    if (document.documentElement.getAttribute('data-color-scheme') === 'auto') {
+      updateGiscusTheme();
+    }
+  });
+});
+</script>
 `;
 
 // 查找所有文章文件
@@ -66,12 +112,23 @@ function addGiscusToArticle(filePath) {
     if (content.includes('giscus.app/client.js')) {
       console.log(`文件已包含giscus评论: ${filePath}`);
       
-      // 如果包含评论标题，则移除
-      if (content.includes('<h2>评论</h2>')) {
-        content = content.replace(/<h2>评论<\/h2>/g, '');
-        fs.writeFileSync(filePath, content, 'utf8');
-        console.log(`已移除评论标题: ${filePath}`);
+      // 替换旧的giscus代码为新的代码
+      const articleEndTag = '</article>';
+      const footerStartTag = '<footer>';
+      
+      // 查找</article>和<footer>之间的内容
+      const startIndex = content.indexOf(articleEndTag) + articleEndTag.length;
+      const endIndex = content.indexOf(footerStartTag);
+      
+      if (startIndex > 0 && endIndex > startIndex) {
+        // 替换整个评论区
+        const newContent = content.substring(0, startIndex) + giscusCode + content.substring(endIndex);
+        fs.writeFileSync(filePath, newContent, 'utf8');
+        console.log(`已更新giscus评论: ${filePath}`);
+      } else {
+        console.log(`无法找到合适的位置更新giscus: ${filePath}`);
       }
+      
       return;
     }
     

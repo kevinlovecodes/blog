@@ -209,7 +209,7 @@
     
 </article>
 <!-- 嵌入giscus评论 -->
-<div style="max-width: 800px; margin: 64px auto 24px; padding: 0 16px;">
+<div style="max-width: 800px; margin: 40px auto 24px; padding: 0 16px;">
   <div class="giscus-container">
     <script src="https://giscus.app/client.js"
       data-repo="kevinlovecodes/blog"
@@ -230,8 +230,52 @@
   </div>
 </div>
 
+<script>
+// 监听主题变化并更新giscus主题
+function updateGiscusTheme() {
+  const theme = document.documentElement.getAttribute('data-color-scheme');
+  let giscusTheme = 'light';
+  
+  if (theme === 'dark') {
+    giscusTheme = 'dark';
+  } else if (theme === 'auto') {
+    giscusTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  
+  function sendMessage(message) {
+    const iframe = document.querySelector('iframe.giscus-frame');
+    if (!iframe) return;
+    iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+  }
+  
+  sendMessage({
+    setConfig: {
+      theme: giscusTheme
+    }
+  });
+}
 
-        <footer>
+// 监听主题切换事件
+document.addEventListener('DOMContentLoaded', function() {
+  updateGiscusTheme();
+  
+  // 监听主题切换
+  const themeToggle = document.getElementById('theme-color-scheme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('change', function() {
+      setTimeout(updateGiscusTheme, 300); // 延迟执行以确保主题已切换
+    });
+  }
+  
+  // 监听系统主题变化（针对auto模式）
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+    if (document.documentElement.getAttribute('data-color-scheme') === 'auto') {
+      updateGiscusTheme();
+    }
+  });
+});
+</script>
+<footer>
     <div class="inner">
         <div class="links">
             
