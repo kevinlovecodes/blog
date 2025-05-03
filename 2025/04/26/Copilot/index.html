@@ -243,7 +243,7 @@
     
 </article>
 <!-- 嵌入giscus评论 -->
-<div style="max-width: 800px; margin: 40px auto 24px; padding: 0 16px;">
+<div style="max-width: 800px; margin: 20px auto 24px; padding: 0 16px;">
   <div class="giscus-container">
     <script src="https://giscus.app/client.js"
       data-repo="kevinlovecodes/blog"
@@ -265,49 +265,69 @@
 </div>
 
 <script>
-// 监听主题变化并更新giscus主题
-function updateGiscusTheme() {
-  const theme = document.documentElement.getAttribute('data-color-scheme');
-  let giscusTheme = 'light';
-  
-  if (theme === 'dark') {
-    giscusTheme = 'dark';
-  } else if (theme === 'auto') {
-    giscusTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+// 修复主题跟随问题
+(function() {
+  // 等待iframe加载完成
+  function waitForGiscusIframe(callback, maxAttempts = 50) {
+    let attempts = 0;
+    const checkInterval = setInterval(function() {
+      const iframe = document.querySelector('iframe.giscus-frame');
+      attempts++;
+      
+      if (iframe) {
+        clearInterval(checkInterval);
+        callback(iframe);
+        return;
+      }
+      
+      if (attempts >= maxAttempts) {
+        clearInterval(checkInterval);
+        console.log('无法找到giscus iframe');
+      }
+    }, 300);
   }
-  
-  function sendMessage(message) {
-    const iframe = document.querySelector('iframe.giscus-frame');
-    if (!iframe) return;
-    iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
-  }
-  
-  sendMessage({
-    setConfig: {
-      theme: giscusTheme
-    }
-  });
-}
 
-// 监听主题切换事件
-document.addEventListener('DOMContentLoaded', function() {
-  updateGiscusTheme();
-  
-  // 监听主题切换
-  const themeToggle = document.getElementById('theme-color-scheme-toggle');
-  if (themeToggle) {
-    themeToggle.addEventListener('change', function() {
-      setTimeout(updateGiscusTheme, 300); // 延迟执行以确保主题已切换
+  // 根据当前主题设置giscus主题
+  function updateGiscusTheme() {
+    const theme = document.documentElement.getAttribute('data-color-scheme');
+    let giscusTheme = 'light';
+    
+    if (theme === 'dark') {
+      giscusTheme = 'dark';
+    } else if (theme === 'auto') {
+      giscusTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    
+    waitForGiscusIframe(function(iframe) {
+      iframe.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: giscusTheme } } },
+        'https://giscus.app'
+      );
     });
   }
-  
-  // 监听系统主题变化（针对auto模式）
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
-    if (document.documentElement.getAttribute('data-color-scheme') === 'auto') {
-      updateGiscusTheme();
-    }
+
+  // 页面加载后初始化
+  window.addEventListener('load', function() {
+    // 初始设置主题
+    updateGiscusTheme();
+    
+    // 监听主题切换按钮的点击
+    const lightBtn = document.querySelector('#theme-color-scheme-toggle input[value="light"]');
+    const darkBtn = document.querySelector('#theme-color-scheme-toggle input[value="dark"]');
+    const autoBtn = document.querySelector('#theme-color-scheme-toggle input[value="auto"]');
+    
+    if (lightBtn) lightBtn.addEventListener('click', function() { setTimeout(updateGiscusTheme, 100); });
+    if (darkBtn) darkBtn.addEventListener('click', function() { setTimeout(updateGiscusTheme, 100); });
+    if (autoBtn) autoBtn.addEventListener('click', function() { setTimeout(updateGiscusTheme, 100); });
+    
+    // 监听系统主题变化
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+      if (document.documentElement.getAttribute('data-color-scheme') === 'auto') {
+        updateGiscusTheme();
+      }
+    });
   });
-});
+})();
 </script>
 <footer>
     <div class="inner">
