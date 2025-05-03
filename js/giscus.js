@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // 加载giscus脚本
       const giscusScript = document.createElement('script');
       giscusScript.src = 'https://giscus.app/client.js';
-      giscusScript.setAttribute('data-repo', 'kevinlovecodes/Blog');
+      giscusScript.setAttribute('data-repo', 'kevinlovecodes/blog');
       giscusScript.setAttribute('data-repo-id', 'R_kgDOOjvubQ');
       giscusScript.setAttribute('data-category', 'Announcements');
       giscusScript.setAttribute('data-category-id', 'DIC_kwDOOjvubc4CpufH');
