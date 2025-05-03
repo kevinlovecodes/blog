@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>固定的友链评论区</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        pre {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        code {
+            font-family: monospace;
+        }
+        .copy-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .copy-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>解决友链评论区闪动问题</h1>
+    
+    <div class="instructions">
+        <h2>使用说明</h2>
+        <p>以下代码可以直接替换友链页面中的评论区部分，它具有以下特点：</p>
+        <ul>
+            <li>固定的评论区样式，不会因为脚本加载顺序而闪动</li>
+            <li>使用淡入效果平滑显示评论区，避免突然出现的视觉跳动</li>
+            <li>评论区上方间距为50px，下方间距为10px，与博文页面保持一致</li>
+        </ul>
+        <p><strong>替换方法：</strong></p>
+        <ol>
+            <li>打开友链页面HTML文件（<code>friends/index.html</code>）</li>
+            <li>查找 <code>&lt;!-- 嵌入giscus评论 --&gt;</code> 开始的评论区</li>
+            <li>将整个评论区部分（从注释开始到下一个主要部分之前）替换为下面的代码</li>
+            <li>保存文件并清除浏览器缓存</li>
+        </ol>
+    </div>
+    
+    <h2>完整的评论区代码 (不会闪动)</h2>
+    <button class="copy-btn" onclick="copyCode('comment-code')">复制代码</button>
+    <pre><code id="comment-code"><!-- 嵌入giscus评论 - 防闪动版本 -->
+<div style="max-width: 800px; margin: 50px auto 10px !important; padding: 0 16px;">
+  <!-- 防止评论区闪动的样式 -->
+  <style id="anti-flicker-giscus">
+    /* 固定样式，避免闪动 */
+    div[style*="max-width: 800px"] {
+      max-width: 800px !important;
+      margin: 50px auto 10px !important;
+      padding: 0 16px !important;
+      transition: none !important;
+      animation: none !important;
+    }
+    
+    .giscus-container {
+      margin-bottom: 10px !important;
+    }
+    
+    /* 隐藏评论区直到完全加载 */
+    .giscus-frame-container {
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    
+    /* 当加载完成后显示 */
+    .giscus-frame-container.loaded {
+      opacity: 1;
+    }
+  </style>
+  
+  <!-- 评论区容器 -->
+  <div class="giscus-container">
+    <!-- 包装iframe的容器，用于控制显示/隐藏 -->
+    <div class="giscus-frame-container">
+      <script>
+        // 立即执行获取当前主题并设置giscus的主题
+        (function() {
+          // 获取当前主题
+          function getCurrentTheme() {
+            const theme = document.documentElement.getAttribute('data-color-scheme');
+            if (theme === 'dark') return 'dark';
+            if (theme === 'light') return 'light';
+            // 如果是auto，则根据系统主题决定
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          
+          // 设置giscus的主题属性
+          document.write('<script src="https://giscus.app/client.js" \
+            data-repo="kevinlovecodes/blog" \
+            data-repo-id="R_kgDOOjvubQ" \
+            data-category="Announcements" \
+            data-category-id="DIC_kwDOOjvubc4CpufH" \
+            data-mapping="pathname" \
+            data-strict="0" \
+            data-reactions-enabled="1" \
+            data-emit-metadata="0" \
+            data-input-position="bottom" \
+            data-theme="' + getCurrentTheme() + '" \
+            data-lang="zh-CN" \
+            data-loading="lazy" \
+            crossorigin="anonymous" \
+            async><\/script>');
+        })();
+      </script>
+    </div>
+  </div>
+</div>
+
+<!-- 控制评论区加载和显示的脚本 -->
+<script>
+(function() {
+  // 等待DOM加载完成
+  document.addEventListener('DOMContentLoaded', function() {
+    // 监听iframe的加载
+    const observer = new MutationObserver(function(mutations) {
+      for (const mutation of mutations) {
+        if (mutation.addedNodes && mutation.addedNodes.length) {
+          for (const node of mutation.addedNodes) {
+            if (node.tagName === 'IFRAME' && node.classList.contains('giscus-frame')) {
+              // 找到父容器
+              let container = node.closest('.giscus-frame-container');
+              if (!container) {
+                // 如果没有找到，可能是因为DOM结构不同，尝试查找其他容器
+                container = document.querySelector('.giscus-frame-container');
+              }
+              
+              if (container) {
+                // 监听iframe加载完成
+                node.addEventListener('load', function() {
+                  // 延迟一点时间后显示
+                  setTimeout(function() {
+                    container.classList.add('loaded');
+                  }, 300);
+                });
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    // 监听整个文档的变化
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    // 如果5秒后仍未加载完成，强制显示
+    setTimeout(function() {
+      const containers = document.querySelectorAll('.giscus-frame-container');
+      containers.forEach(container => {
+        if (!container.classList.contains('loaded')) {
+          container.classList.add('loaded');
+        }
+      });
+    }, 5000);
+  });
+})();
+</script></code></pre>
+
+    <h2>仅防闪动的样式和脚本</h2>
+    <p>如果您不想替换整个评论区，也可以只添加以下样式和脚本到页面头部：</p>
+    <button class="copy-btn" onclick="copyCode('style-script')">复制代码</button>
+    <pre><code id="style-script"><!-- 防闪动样式和脚本 - 添加到head标签内 -->
+<style id="anti-flicker-styles">
+  /* 固定评论区样式，避免闪动 */
+  div[style*="max-width: 800px"] {
+    max-width: 800px !important;
+    margin: 50px auto 10px !important;
+    padding: 0 16px !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .giscus-container, 
+  iframe.giscus-frame,
+  .giscus,
+  .giscus-wrapper {
+    margin-bottom: 10px !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  /* 控制评论区显示 */
+  iframe.giscus-frame {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  iframe.giscus-frame.loaded {
+    opacity: 1;
+  }
+</style>
+
+<script>
+// 防闪动控制脚本
+(function() {
+  window.addEventListener('load', function() {
+    // 直接修改评论区容器样式
+    const container = document.querySelector('div[style*="max-width: 800px"]');
+    if (container) {
+      container.style.cssText = 'max-width: 800px !important; margin: 50px auto 10px !important; padding: 0 16px !important;';
+    }
+    
+    // 观察iframe加载
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.addedNodes && mutation.addedNodes.length) {
+          for (let i = 0; i < mutation.addedNodes.length; i++) {
+            const node = mutation.addedNodes[i];
+            if (node.tagName === 'IFRAME' && node.classList.contains('giscus-frame')) {
+              // 监听iframe加载完成
+              node.addEventListener('load', function() {
+                setTimeout(function() {
+                  node.classList.add('loaded');
+                }, 300);
+              });
+            }
+          }
+        }
+      });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    // 5秒后如果还未加载完成，强制显示
+    setTimeout(function() {
+      const iframes = document.querySelectorAll('iframe.giscus-frame');
+      iframes.forEach(function(iframe) {
+        if (!iframe.classList.contains('loaded')) {
+          iframe.classList.add('loaded');
+        }
+      });
+    }, 5000);
+  });
+})();
+</script></code></pre>
+
+    <script>
+        function copyCode(elementId) {
+            const codeElement = document.getElementById(elementId);
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            const btn = document.querySelector(`button[onclick="copyCode('${elementId}')"]`);
+            const originalText = btn.textContent;
+            btn.textContent = '已复制!';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 2000);
+        }
+    </script>
+</body>
+</html> 
