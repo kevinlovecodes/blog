@@ -23,10 +23,10 @@ document.addEventListener('DOMContentLoaded', function() {
       // 加载giscus脚本
       const giscusScript = document.createElement('script');
       giscusScript.src = 'https://giscus.app/client.js';
-      giscusScript.setAttribute('data-repo', 'kevinlovecodes/blog');
-      giscusScript.setAttribute('data-repo-id', 'R_kgDOOi3xoQ');
+      giscusScript.setAttribute('data-repo', 'kevinlovecodes/Blog');
+      giscusScript.setAttribute('data-repo-id', 'R_kgDOOjvubQ');
       giscusScript.setAttribute('data-category', 'Announcements');
-      giscusScript.setAttribute('data-category-id', 'DIC_kwDOOi3xoc4Cpqu-');
+      giscusScript.setAttribute('data-category-id', 'DIC_kwDOOjvubc4CpufH');
       giscusScript.setAttribute('data-mapping', 'pathname');
       giscusScript.setAttribute('data-strict', '0');
       giscusScript.setAttribute('data-reactions-enabled', '1');
