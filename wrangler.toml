@@ -1,0 +1,7 @@
+name = "blog-meta"
+compatibility_date = "2025-05-04"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "blog-meta"
+database_id = "54424d22-92de-453e-b039-408df3be0ea9"
