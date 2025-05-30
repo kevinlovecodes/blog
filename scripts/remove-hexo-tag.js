@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const { getAllHTMLFiles } = require('./giscus/utils');
 
 /**
  * 从HTML文件中移除Hexo生成器标记
@@ -12,12 +11,12 @@ function removeHexoGeneratorTag(filePath) {
     console.log(`处理文件: ${filePath}`);
     let content = fs.readFileSync(filePath, 'utf8');
     
-    // 查找Hexo生成器标记
-    const hexoTagRegex = /<meta name="generator" content="Hexo [^"]*">\s*<\/head>/g;
+    // 查找Hexo生成器标记 - 修正正则表达式
+    const hexoTagRegex = /<meta name="generator" content="Hexo [^"]*">/g;
     
     if (content.match(hexoTagRegex)) {
-      // 替换为仅有</head>标签
-      const newContent = content.replace(hexoTagRegex, '</head>');
+      // 替换标记
+      const newContent = content.replace(hexoTagRegex, '');
       
       // 写入文件
       fs.writeFileSync(filePath, newContent, 'utf8');
@@ -28,7 +27,7 @@ function removeHexoGeneratorTag(filePath) {
       return false;
     }
   } catch (error) {
-    console.error(`处理文件错误: ${filePath}`, error);
+    console.error(`处理文件时出错: ${filePath}`, error);
     return false;
   }
 }
@@ -40,7 +39,7 @@ function main() {
   console.log('开始移除Hexo生成器标记...');
   
   // 获取所有HTML文件
-  const htmlFiles = getAllHTMLFiles();
+  const htmlFiles = findHTMLFiles('.');
   console.log(`找到 ${htmlFiles.length} 个HTML文件`);
   
   // 统计更新计数
@@ -51,19 +50,58 @@ function main() {
     if (removeHexoGeneratorTag(filePath)) {
       updatedCount++;
     }
-  });
-  
-  // 处理根目录的index.html
-  const indexPath = path.join(process.cwd(), 'index.html');
-  if (fs.existsSync(indexPath)) {
-    if (removeHexoGeneratorTag(indexPath)) {
-      updatedCount++;
+    
+    // 如果是index.html，还需要检查父目录下是否有index.html
+    if (path.basename(filePath) === 'index.html') {
+      const indexPath = path.join(path.dirname(filePath), 'index.html');
+      if (indexPath !== filePath && fs.existsSync(indexPath)) {
+        if (removeHexoGeneratorTag(indexPath)) {
+          updatedCount++;
+        }
+      }
     }
-  }
+  });
   
   // 显示任务结果
   console.log('\n所有文件处理完成！');
   console.log(`共移除了 ${updatedCount} 个文件中的Hexo生成器标记`);
+}
+
+/**
+ * 查找所有HTML文件
+ * @param {string} dir - 要搜索的目录
+ * @param {Array} fileList - 累积的文件列表
+ * @returns {Array} - HTML文件列表
+ */
+function findHTMLFiles(dir, fileList = []) {
+  console.log(`正在搜索目录: ${dir}`);
+  try {
+    const files = fs.readdirSync(dir);
+    
+    files.forEach(file => {
+      const filePath = path.join(dir, file);
+      try {
+        const stat = fs.statSync(filePath);
+        
+        // 忽略backup目录
+        if (filePath.includes('backup')) {
+          return;
+        }
+        
+        if (stat.isDirectory()) {
+          findHTMLFiles(filePath, fileList);
+        } else if (file.endsWith('.html')) {
+          fileList.push(filePath);
+        }
+      } catch (err) {
+        console.error(`无法访问文件: ${filePath}`, err);
+      }
+    });
+  } catch (err) {
+    console.error(`无法读取目录: ${dir}`, err);
+  }
+  
+  return fileList;
 }
 
 // 执行主函数
