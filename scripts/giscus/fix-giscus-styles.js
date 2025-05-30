@@ -129,7 +129,7 @@ const inlineScript = `
 // 要添加的iframe样式注入器脚本标记
 const iframeInjectorTag = `
   <!-- Giscus iframe样式注入器 -->
-  <script src="/iframe-style-injector.js"></script>
+  <script src="/scripts/giscus/iframe-style-injector.js"></script>
 `;
 
 /**
@@ -217,7 +217,7 @@ function addIframeInjectorScript(filePath) {
     
     // 检查文件是否已经包含该脚本
     if (content.includes('iframe-style-injector.js')) {
-      console.log(`文件已包含样式注入脚本: ${filePath}`);
+      console.log(`文件已包含iframe样式注入器: ${filePath}`);
       return false;
     }
     

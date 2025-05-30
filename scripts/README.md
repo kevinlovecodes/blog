@@ -14,7 +14,8 @@ scripts/
   │   ├── import-posts.js # 导入文章元数据到数据库
   │   ├── schema.sql      # 数据库表结构
   │   └── wrangler.toml   # Cloudflare配置
-  └── giscus-fix.js       # Giscus修复主入口
+  ├── giscus-fix.js       # Giscus修复主入口
+  └── remove-hexo-tag.js  # 移除Hexo生成器标记
 ```
 
 ## 脚本说明
@@ -33,11 +34,10 @@ scripts/
 
 3. **iframe-style-injector.js**：
    - 用于注入样式到Giscus iframe内部
-   - 保持原始功能不变
+   - 调整评论区内部的间距和样式
 
 4. **giscus-fix.js**：
    - 主脚本入口，用于执行所有Giscus相关的修复工作
-   - 替代了原来的fix-giscus-all.js
 
 ### 数据库相关脚本
 
@@ -46,29 +46,32 @@ scripts/
    - 支持本地和远程数据库操作
 
 2. **schema.sql**：
-   - 数据库表结构定义
+   - 定义数据库表结构
+   - 包含posts表的创建语句
 
 3. **wrangler.toml**：
    - Cloudflare Wrangler配置文件
+   - 定义D1数据库连接信息
 
-## 如何使用
+### 其他工具脚本
 
-### 修复Giscus评论区样式
+1. **remove-hexo-tag.js**：
+   - 移除所有HTML文件中的Hexo生成器标记
+   - 防止暴露网站是由Hexo生成的
+
+## 使用方法
+
+所有脚本都可以通过npm命令运行，例如：
 
 ```bash
+# 修复Giscus评论区样式
 npm run fix-giscus
-```
 
-### 导入文章元数据到数据库
-
-```bash
+# 导入文章元数据到数据库
 npm run import-posts
-```
 
-如需操作远程数据库，请添加`--remote`参数：
-
-```bash
-npm run import-posts -- --remote
+# 移除Hexo生成器标记
+npm run remove-hexo-tag
 ```
 
 ## 优化内容

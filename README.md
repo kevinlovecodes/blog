@@ -17,9 +17,15 @@ blog/
   │   └── giscus-custom.css # Giscus评论样式（整合版）
   ├── scripts/             # 脚本目录
   │   ├── giscus/          # Giscus评论系统相关脚本
+  │   │   ├── utils.js     # 通用工具函数
+  │   │   ├── fix-giscus-styles.js  # 样式修复脚本
+  │   │   └── iframe-style-injector.js # iframe样式注入器
   │   ├── database/        # 数据库相关脚本
-  │   └── giscus-fix.js    # Giscus修复主入口
-  ├── iframe-style-injector.js # Giscus iframe样式注入器
+  │   │   ├── import-posts.js # 导入文章元数据脚本
+  │   │   ├── schema.sql   # 数据库结构
+  │   │   └── wrangler.toml # Cloudflare配置
+  │   ├── giscus-fix.js    # Giscus修复主入口
+  │   └── remove-hexo-tag.js # 移除Hexo标记脚本
   ├── search.json          # 文章索引数据
   └── [其他博客文件和目录]
 ```
@@ -49,6 +55,7 @@ CREATE TABLE IF NOT EXISTS posts (
 2. 安装依赖：`npm install`
 3. 导入文章数据：`npm run import-posts`
 4. 修复Giscus样式：`npm run fix-giscus`
+5. 移除Hexo标记：`npm run remove-hexo-tag`
 
 ## 部署
 
@@ -57,5 +64,4 @@ CREATE TABLE IF NOT EXISTS posts (
 ## 远程操作
 
 如需操作远程数据库，请在命令后添加`--remote`参数，例如：
-
 ```
