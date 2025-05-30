@@ -28,7 +28,7 @@ const posts = data.map(post => {
 async function insertData() {
   try {
     console.log(`共找到 ${posts.length} 篇文章，开始导入到数据库...`);
-    
+
     for (let post of posts) {
       const command = `npx wrangler d1 execute blog-meta --command="INSERT INTO posts (title, slug, created_at) VALUES ('${post.title.replace(/'/g, "''")}', '${post.slug.replace(/'/g, "''")}', '${post.created_at}');"${isRemote ? ' --remote' : ''}`;
       
@@ -47,8 +47,8 @@ async function insertData() {
     console.log(`npx wrangler d1 execute blog-meta --command="SELECT * FROM posts;"${isRemote ? ' --remote' : ''}`);
   } catch (error) {
     console.error(`执行过程中出错: ${error.message}`);
-  }
-}
+        }
+      }
 
 // 执行导入
 insertData();

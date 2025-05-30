@@ -1,24 +1,18 @@
 {
-  "name": "blog-meta",
+  "name": "blog",
   "version": "1.0.0",
-  "description": "博客数据库系统 - 使用Cloudflare D1存储博客文章元数据",
-  "main": "import-posts.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "echo \"No build step required\" && exit 0",
-    "dev": "echo \"Static site, no dev server required\" && exit 0",
-    "start": "echo \"Static site, no server required\" && exit 0"
+    "fix-giscus": "node scripts/giscus-fix.js",
+    "import-posts": "node scripts/database/import-posts.js",
+    "remove-hexo-tag": "node scripts/remove-hexo-tag.js"
   },
-  "keywords": [
-    "blog",
-    "cloudflare",
-    "d1",
-    "database",
-    "hexo"
-  ],
-  "author": "kevinlovecodes",
-  "license": "MIT",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.12"
+    "cheerio": "^1.0.0"
   }
 }

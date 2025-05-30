@@ -1,7 +1,19 @@
-/* 自定义Giscus评论区样式 */
+/* 自定义Giscus评论区样式 - 整合版 */
+
+/* 基础容器样式 */
+.giscus {
+  width: calc(100% - 32px);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 16px;
+}
+
 .giscus-container {
   margin-top: 30px !important;
   margin-bottom: 10px !important;
+  max-width: 800px;
+  padding: 0 16px;
 }
 
 /* 评论区iframe容器 */
